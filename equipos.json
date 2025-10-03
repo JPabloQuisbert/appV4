@@ -1,0 +1,35 @@
+[
+  {
+    "id": "331719a9-716b-4130-9a01-2a8880ddd623",
+    "nombre": "wqeqwe",
+    "imagen": "/static/uploads/331719a9-716b-4130-9a01-2a8880ddd623.png",
+    "areas": {
+      "rally": 25,
+      "memoria": 25,
+      "cartas": 21,
+      "declaracion": 11
+    }
+  },
+  {
+    "id": "36ad166e-173f-4bcc-ac5b-23bc184ff922",
+    "nombre": "123",
+    "imagen": null,
+    "areas": {
+      "rally": 9,
+      "memoria": 25,
+      "cartas": 19,
+      "declaracion": 25
+    }
+  },
+  {
+    "id": "c9f7e441-035d-4b4b-98d6-397cb2257164",
+    "nombre": "23123",
+    "imagen": null,
+    "areas": {
+      "rally": 12,
+      "memoria": 15,
+      "cartas": 19,
+      "declaracion": 15
+    }
+  }
+]

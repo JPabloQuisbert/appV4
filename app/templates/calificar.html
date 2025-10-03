@@ -1,0 +1,46 @@
+<!-- public/calificar.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calificar Equipos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    .is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220,53,69,.25);
+        }
+  </style>
+
+</head>
+<body class="bg-light">
+  {% extends 'base.html' %}
+
+  {% block title %}Registro de Equipos{% endblock %}
+  {% block content %}
+<div class="container py-5">
+  <h1 class="text-center mb-4">Calificar Equipos</h1>
+
+  <div class="table-responsive">
+    <table class="table table-bordered align-middle text-center">
+      <thead class="table-dark">
+        <tr>
+          <th>Equipo</th>
+          <th>Rally Bíblico</th>
+          <th>Memoria Bíblica</th>
+          <th>Cartas Carcelarias</th>
+          <th>Declaración de Fe</th>
+          <th>Total</th>
+          <th>Guardar</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-equipos"></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="../static/js/calificar.js"></script>
+{% endblock %}
+</body>
+</html>

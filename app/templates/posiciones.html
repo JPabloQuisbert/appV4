@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tabla de Posiciones</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    .position-change {
+      font-size: 1.2rem;
+      width: 30px;
+    }
+    .up {
+      color: green;
+    }
+    .down {
+      color: red;
+    }
+    .no-change {
+      color: gray;
+    }
+    img.team-img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+  body {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('/logo_djo.jpg'); /* Tu imagen */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  /* 🔽 Overlay semitransparente para atenuar fondo */
+  body::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.1); /* 🔥 Ajusta el 0.4 para más o menos oscuridad */
+    z-index: 0;
+  }
+
+  /* 🔼 Asegura que el contenido esté por encima del overlay */
+  .container, .text-center, .card {
+    position: relative;
+    z-index: 1;
+  }
+
+  .fondo-blanco {
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  </style>
+</head>
+<body class="bg-light">
+  {% extends 'base.html' %}
+
+  {% block title %}Registro de Equipos{% endblock %}
+  {% block content %}
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+<script>
+  const socket = io();  // Esto conecta al servidor
+  socket.on('connect', () => {
+    console.log('🔌 Conectado al socket');
+  });
+
+  socket.on('actualizar', data => {
+    console.log('🔁 Recibido:', data);
+    location.reload(); // Recargar si llega actualización
+  });
+</script>
+  <div class="container py-5">
+    <div class="text-center my-4">
+    <img src="../static/img/logo_djo.jpg" alt="Logo del evento" class="img-fluid" style="max-height: 150px;">
+    </div> 
+    <h1 class="text-center mb-4">Tabla de Posiciones</h1>
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Equipo</th>
+            <th>Rally Bíblico</th>
+            <th>Memoria Bíblica</th>
+            <th>Cartas Carcelarias</th>
+            <th>Declaración de Fe</th>
+            <th>Total</th>
+            <th>Cambio</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-posiciones"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function cargarPosiciones() {
+      const res = await fetch('/api/equipos');
+      const equipos = await res.json();
+
+      // Calcular total y ordenar descendente por total
+      equipos.forEach(e => {
+        e.total = (e.areas?.rally || 0) + (e.areas?.memoria || 0) + (e.areas?.cartas || 0) + (e.areas?.declaracion || 0);
+      });
+      equipos.sort((a, b) => b.total - a.total);
+
+      // Obtener posiciones previas de localStorage para comparar cambio
+      const posicionesPrevias = JSON.parse(localStorage.getItem('posicionesPrevias')) || {};
+      
+      const tbody = document.getElementById('tabla-posiciones');
+      tbody.innerHTML = '';
+
+      equipos.forEach((equipo, index) => {
+        const posicionActual = index + 1;
+        const posicionAnterior = posicionesPrevias[equipo.id] || posicionActual;
+
+        let cambio = '';
+        let claseCambio = 'no-change';
+
+        if (posicionActual < posicionAnterior) {
+          cambio = '▲';  // subió
+          claseCambio = 'up';
+        } else if (posicionActual > posicionAnterior) {
+          cambio = '▼';  // bajó
+          claseCambio = 'down';
+        } else {
+          cambio = '–';  // sin cambio
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${posicionActual}</td>
+          <td class="text-start d-flex align-items-center">
+            <img src="${equipo.imagen || 'https://via.placeholder.com/40'}" alt="Equipo" class="team-img" />
+            <strong>${equipo.nombre}</strong>
+          </td>
+          <td>${equipo.areas?.rally || 0}</td>
+          <td>${equipo.areas?.memoria || 0}</td>
+          <td>${equipo.areas?.cartas || 0}</td>
+          <td>${equipo.areas?.declaracion || 0}</td>
+          <td><strong>${equipo.total}</strong></td>
+          <td class="position-change ${claseCambio}">${cambio}</td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      // Guardar posiciones actuales para la próxima comparación
+      const nuevasPosiciones = {};
+      equipos.forEach((e, i) => {
+        nuevasPosiciones[e.id] = i + 1;
+      });
+      localStorage.setItem('posicionesPrevias', JSON.stringify(nuevasPosiciones));
+    }
+
+    cargarPosiciones();
+  </script>
+  {% endblock %}
+</body>
+</html>
